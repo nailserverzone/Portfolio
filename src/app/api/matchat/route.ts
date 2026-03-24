@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabase";
 
 /* ══════════════════════════════════════
    Matchat API — Submit & Fetch Messages
@@ -7,11 +7,6 @@ import { createClient } from "@supabase/supabase-js";
    - Input validation & sanitization
    - Moderation queue (pending → approved)
    ══════════════════════════════════════ */
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 /* ── Rate limiter (in-memory, per-IP) ── */
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -68,7 +63,7 @@ function isSpam(text: string): boolean {
 
 /* ══ GET — Fetch approved messages ══ */
 export async function GET() {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("matchat_messages")
     .select("*")
     .eq("status", "approved")
@@ -136,7 +131,7 @@ export async function POST(req: NextRequest) {
   }
 
   /* Insert as pending */
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from("matchat_messages")
     .insert({
       message: cleanMessage,

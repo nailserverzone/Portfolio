@@ -1,18 +1,27 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
-/* ── Supabase client ──
-   Keys MUST come from environment variables.
-   NEXT_PUBLIC_ prefix makes them available client-side,
-   which is fine for the anon key (it's meant to be public)
-   as long as RLS policies are properly configured.
+/* ── Supabase client (lazy-initialized) ──
+   Defers creation until first use so env vars
+   don't need to exist at build time (Vercel).
 */
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+let _client: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    "[supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY env vars."
-  );
+export function getSupabase(): SupabaseClient {
+  if (!_client) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      throw new Error("[supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    }
+    _client = createClient(url, key);
+  }
+  return _client;
 }
 
-export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
+/** @deprecated — use getSupabase() for lazy init */
+export const supabase = typeof window !== "undefined"
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ""
+    )
+  : (null as unknown as SupabaseClient);

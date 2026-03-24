@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getSupabase } from "@/lib/supabase";
 
 /* ══════════════════════════════════════
    Matchat Moderation API
@@ -7,12 +7,9 @@ import { createClient } from "@supabase/supabase-js";
    - Server-side admin password verification
    ══════════════════════════════════════ */
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-const ADMIN_PASSWORD = process.env.MATCHAT_ADMIN_PASSWORD;
+function getAdminPassword() {
+  return process.env.MATCHAT_ADMIN_PASSWORD;
+}
 
 /* ── Rate limiter for admin attempts ── */
 const loginAttempts = new Map<string, { count: number; blockedUntil: number }>();
@@ -52,12 +49,12 @@ export async function GET(req: NextRequest) {
   }
 
   const password = req.headers.get("x-admin-password");
-  if (!password || password !== ADMIN_PASSWORD) {
+  if (!password || password !== getAdminPassword()) {
     recordFailedAttempt(ip);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("matchat_messages")
     .select("*")
     .eq("status", "pending")
@@ -86,7 +83,7 @@ export async function POST(req: NextRequest) {
   const { password, message_id, action } = body;
 
   /* Validate admin password (server-side) */
-  if (!password || password !== ADMIN_PASSWORD) {
+  if (!password || password !== getAdminPassword()) {
     recordFailedAttempt(ip);
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -106,13 +103,13 @@ export async function POST(req: NextRequest) {
 
   /* Execute action */
   if (action === "approve") {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("matchat_messages")
       .update({ status: "approved" })
       .eq("id", message_id);
     if (error) return NextResponse.json({ error: "Failed to approve" }, { status: 500 });
   } else if (action === "deny" || action === "delete") {
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from("matchat_messages")
       .delete()
       .eq("id", message_id);
