@@ -1,8 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://oaasoxtrlydejkulokvt.supabase.co";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hYXNveHRybHlkZWprdWxva3Z0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjIxNTcsImV4cCI6MjA4OTU5ODE1N30.s0_q0XLX8ULKjpkgKNeOoFdIm4QwBc3N9KMFgAqEtc0";
+/* ── Supabase client ──
+   Keys MUST come from environment variables.
+   NEXT_PUBLIC_ prefix makes them available client-side,
+   which is fine for the anon key (it's meant to be public)
+   as long as RLS policies are properly configured.
+*/
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn(
+    "[supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY env vars."
+  );
+}
 
-export const EDGE_FN_URL = `${supabaseUrl}/functions/v1/admin-delete`;
+export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
