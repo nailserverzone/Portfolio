@@ -141,7 +141,12 @@
       "Bash(cp \"/Users/noornailaimtinanhimam/Downloads/Portfolio/graphics/\"* \"/Users/noornailaimtinanhimam/Downloads/portfolio 5/public/gallery/graphics/\")",
       "WebFetch(domain:austinpratik.framer.website)",
       "WebFetch(domain:www.framer.com)",
-      "WebFetch(domain:retro98.framer.website)"
+      "WebFetch(domain:retro98.framer.website)",
+      "Bash(ls \"/Users/noornailaimtinanhimam/Downloads/portfolio 5/public/favicon\"*)",
+      "Bash(ls /Users/noornailaimtinanhimam/Downloads/*.png /Users/noornailaimtinanhimam/Desktop/*.png)",
+      "Bash(find /Users/noornailaimtinanhimam/Downloads -maxdepth 1 -name *.png -newer '/Users/noornailaimtinanhimam/Downloads/portfolio 5/package.json')",
+      "Bash(find /Users/noornailaimtinanhimam -maxdepth 3 -iname *pixel* -o -iname *cat*icon* -o -iname *favicon*)",
+      "mcp__5a92e0b9-5c5d-44e6-9e90-1fc2cf49b926__execute_sql"
     ]
   }
 }
