@@ -130,3 +130,5 @@ Portfolio/
 - TypeScript
 - Framer Motion 12
 - Google Fonts (Silkscreen, Syne, Crimson Pro)
+
+Done
