@@ -239,28 +239,60 @@ export default function ScrollExperience({ onExit, onOpenPanel }: {
         transition: "background 0.3s ease",
       }} />
 
-      {/* Toggle back */}
+      {/* Toggle back — pill-shaped day/night switch */}
       <motion.button
         onClick={onExit}
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.8 }}
         title="Switch to day mode"
+        aria-label="Switch to day mode"
         style={{
           position: "fixed", top: 24, right: 24, zIndex: 300,
-          background: "rgba(255,255,255,0.06)", backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.1)", borderRadius: 30,
-          padding: "10px 20px", cursor: "pointer",
-          display: "flex", alignItems: "center", gap: 8,
-          transition: "all 0.3s",
+          background: "none", border: "none", padding: 0, cursor: "pointer",
         }}
-        whileHover={{ background: "rgba(255,255,255,0.18)", scale: 1.05, borderColor: "rgba(255,255,255,0.3)" }}
       >
-        <span style={{ fontSize: "1.1rem" }}>☀️</span>
-        <span style={{
-          fontFamily: "'Silkscreen', monospace", fontSize: "0.7rem",
-          color: "rgba(255,255,255,0.6)", letterSpacing: 2,
-        }}>DAY</span>
+        <div style={{
+          position: "relative",
+          width: 72, height: 36, borderRadius: 24,
+          background: "linear-gradient(135deg, #1a1a3e 0%, #2d2b55 100%)",
+          border: "2px solid rgba(255,255,255,0.15)",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "0 7px",
+          boxShadow: "inset 0 2px 6px rgba(0,0,0,0.4), 0 0 20px rgba(100,100,255,0.15)",
+          transition: "all 0.3s",
+        }}>
+          {/* Sun icon (left) */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ zIndex: 1, flexShrink: 0 }}>
+            <circle cx="12" cy="12" r="5" fill="#F9D71C" />
+            <g stroke="#F9D71C" strokeWidth="2" strokeLinecap="round">
+              <line x1="12" y1="1" x2="12" y2="4" />
+              <line x1="12" y1="20" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+              <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="4" y2="12" />
+              <line x1="20" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+              <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+            </g>
+          </svg>
+          {/* Moon icon (right) */}
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ zIndex: 1, flexShrink: 0 }}>
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#E8E8E8" />
+            <circle cx="17" cy="8" r="1" fill="rgba(255,255,255,0.8)" />
+            <circle cx="19" cy="12" r="0.6" fill="rgba(255,255,255,0.6)" />
+            <circle cx="15" cy="5" r="0.6" fill="rgba(255,255,255,0.6)" />
+          </svg>
+          {/* Thumb — positioned right (night active) */}
+          <div style={{
+            position: "absolute",
+            right: 4, top: "50%", transform: "translateY(-50%)",
+            width: 26, height: 26, borderRadius: "50%",
+            background: "linear-gradient(135deg, #3b3b7a 0%, #5252a3 100%)",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,255,255,0.15)",
+            transition: "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+          }} />
+        </div>
       </motion.button>
 
       {/* Scroll progress bar */}

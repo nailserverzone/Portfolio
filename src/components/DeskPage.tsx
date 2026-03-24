@@ -226,22 +226,48 @@ export default function DeskPage() {
           gap: 4px;
           z-index: 22;
         }
-        .tb-start {
+        .mode-toggle {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          flex-shrink: 0;
+        }
+        .mode-toggle-track {
+          position: relative;
+          width: 60px;
+          height: 30px;
+          border-radius: 20px;
+          background: linear-gradient(135deg, #e8e8f0 0%, #d4d4e0 100%);
+          border: 2px solid #1B1B1B;
           display: flex;
           align-items: center;
-          gap: 4px;
-          padding: 4px 10px;
-          background: #91c633;
-          border: 2px solid #1B1B1B;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.15s;
-          flex-shrink: 0;
-          height: 30px;
+          justify-content: space-between;
+          padding: 0 5px;
+          transition: all 0.4s ease;
+          box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
         }
-        .tb-start:hover { background: #a0d640; transform: scale(1.05); }
-        .tb-start img { width: 16px; height: 16px; object-fit: contain; }
-        .tb-start span {
+        .mode-toggle:hover .mode-toggle-track {
+          transform: scale(1.08);
+          box-shadow: inset 0 1px 3px rgba(0,0,0,0.1), 0 0 12px rgba(249,215,28,0.4);
+        }
+        .mode-icon {
+          width: 16px;
+          height: 16px;
+          z-index: 1;
+          flex-shrink: 0;
+        }
+        .mode-toggle-thumb {
+          position: absolute;
+          left: 3px;
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+          transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mode-toggle span {
           font-family: 'Silkscreen', monospace;
           font-size: 9px;
           color: white;
@@ -287,7 +313,9 @@ export default function DeskPage() {
           .about-frame-area { width: clamp(120px, 38vw, 200px); }
           .tb-btn { font-size: 8px; gap: 2px; padding: 0 3px; }
           .tb-btn img { width: 14px; height: 14px; }
-          .tb-start span { font-size: 7px; }
+          .mode-toggle-track { width: 50px; height: 26px; }
+          .mode-toggle-thumb { width: 18px; height: 18px; }
+          .mode-icon { width: 13px; height: 13px; }
         }
 
         /* Wide screens - NAILA huge, above the grass */
@@ -435,9 +463,34 @@ export default function DeskPage() {
         <div className="rainbow-bar" />
         <div className="blue-bar" />
         <div className="taskbar">
-          <button className="tb-start" onClick={() => setNightMode(n => !n)}>
-            <span style={{ fontSize: 14, lineHeight: 1 }}>{nightMode ? "☀️" : "🌙"}</span>
-            <span>{nightMode ? "day" : "night"}</span>
+          <button
+            className="mode-toggle"
+            onClick={() => setNightMode(n => !n)}
+            title="Switch to night mode"
+            aria-label="Switch to night mode"
+          >
+            <div className="mode-toggle-track">
+              <svg className="mode-icon sun-icon" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="5" fill="#F9D71C" />
+                <g stroke="#F9D71C" strokeWidth="2" strokeLinecap="round">
+                  <line x1="12" y1="1" x2="12" y2="4" />
+                  <line x1="12" y1="20" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+                  <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="4" y2="12" />
+                  <line x1="20" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+                  <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+                </g>
+              </svg>
+              <svg className="mode-icon moon-icon" viewBox="0 0 24 24" fill="none">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="#E8E8E8" />
+                <circle cx="17" cy="8" r="1" fill="rgba(255,255,255,0.8)" />
+                <circle cx="19" cy="12" r="0.6" fill="rgba(255,255,255,0.6)" />
+                <circle cx="15" cy="5" r="0.6" fill="rgba(255,255,255,0.6)" />
+              </svg>
+              <div className="mode-toggle-thumb" />
+            </div>
           </button>
           <div className="tb-items">
             <button className="tb-btn" onClick={() => open("about")}>
