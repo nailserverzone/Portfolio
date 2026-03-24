@@ -307,7 +307,7 @@ export default function DeskPage() {
 
         /* Narrow screens - prevent NAILA overlapping icons */
         @media (max-width: 550px) {
-          .hero-center { left: 50%; }
+          .hero-center { left: 55%; bottom: calc(40% + ${TB}px - 2vh); }
           .hero-naila-img { height: clamp(70px, 30vw, 150px); }
           .hero-hi-text { font-size: clamp(14px, 4vw, 22px); }
           .about-frame-area { width: clamp(120px, 38vw, 200px); }
