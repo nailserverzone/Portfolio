@@ -1,0 +1,26 @@
+{
+  "name": "naila-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.99.3",
+    "framer-motion": "^12.0.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "puppeteer": "^24.40.0",
+    "sharp": "^0.34.5",
+    "typescript": "^5.7.0"
+  }
+}
