@@ -12,6 +12,154 @@ import { PROJECT_STORIES } from "@/data/project-stories";
 
 const FEATURED = PROJECTS.slice(0, 6);
 
+/* ── Scratch-to-reveal name component ── */
+function ScratchReveal() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scratching, setScratching] = useState(false);
+  const [revealed, setRevealed] = useState(false);
+  const [percentScratched, setPercentScratched] = useState(0);
+  const initDone = useRef(false);
+
+  // Draw the scratch overlay
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || initDone.current) return;
+    initDone.current = true;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // Gradient cover
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, "#e8a0bf");
+    grad.addColorStop(0.3, "#d64479");
+    grad.addColorStop(0.6, "#f0a040");
+    grad.addColorStop(1, "#fdba2f");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Scratch hint text
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.font = "bold 16px 'DM Sans', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("✦ scratch to reveal ✦", w / 2, h / 2);
+
+    // Sparkle dots
+    for (let i = 0; i < 30; i++) {
+      const sx = Math.random() * w;
+      const sy = Math.random() * h;
+      const sr = Math.random() * 2 + 0.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy, sr, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.4 + 0.1})`;
+      ctx.fill();
+    }
+  }, []);
+
+  const getPos = useCallback((e: React.PointerEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (canvas.width / rect.width),
+      y: (e.clientY - rect.top) * (canvas.height / rect.height),
+    };
+  }, []);
+
+  const scratch = useCallback((e: React.PointerEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !scratching) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const { x, y } = getPos(e);
+
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, 28, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Also add some scattered erases for a more natural feel
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(x + (Math.random() - 0.5) * 30, y + (Math.random() - 0.5) * 30, 10 + Math.random() * 8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over";
+
+    // Check how much has been scratched
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let transparent = 0;
+    for (let i = 3; i < imageData.data.length; i += 4) {
+      if (imageData.data[i] === 0) transparent++;
+    }
+    const pct = transparent / (imageData.data.length / 4);
+    setPercentScratched(pct);
+    if (pct > 0.45) {
+      setRevealed(true);
+    }
+  }, [scratching, getPos]);
+
+  return (
+    <div ref={containerRef} style={{ position: "relative", display: "inline-block" }}>
+      {/* The actual text underneath */}
+      <h1
+        style={{
+          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900,
+          fontSize: "clamp(60px, 14vw, 180px)", lineHeight: 0.9,
+          margin: 0, color: "white",
+          textShadow: "0 0 40px rgba(214,68,121,0.5), 0 0 80px rgba(253,186,47,0.3)",
+        }}
+      >
+        NAILA
+      </h1>
+
+      {/* Scratch overlay canvas */}
+      <AnimatePresence>
+        {!revealed && (
+          <motion.canvas
+            ref={canvasRef}
+            width={600}
+            height={180}
+            exit={{ opacity: 0, scale: 1.1 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            onPointerDown={(e) => { setScratching(true); (e.target as HTMLElement).setPointerCapture(e.pointerId); scratch(e); }}
+            onPointerMove={scratch}
+            onPointerUp={() => setScratching(false)}
+            onPointerLeave={() => setScratching(false)}
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              cursor: `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="1.5"/></svg>')}") 16 16, crosshair`,
+              borderRadius: 8,
+              touchAction: "none",
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Progress shimmer bar */}
+      {!revealed && percentScratched > 0 && (
+        <div style={{
+          position: "absolute", bottom: -16, left: "10%", right: "10%",
+          height: 3, borderRadius: 2, background: "rgba(255,255,255,0.1)", overflow: "hidden",
+        }}>
+          <motion.div
+            animate={{ width: `${percentScratched * 100}%` }}
+            style={{
+              height: "100%", borderRadius: 2,
+              background: "linear-gradient(90deg, #d64479, #fdba2f)",
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 const experience = [
   { role: "Product Implementation Apprentice", org: "PT. Prudential Corporation", year: "2026 - Present" },
   { role: "Research Assistant", org: "UBC SPIN Lab", year: "2024 - 2025" },
@@ -212,23 +360,13 @@ export default function ScrollExperience({ onExit, onOpenPanel }: {
               HI! I&apos;M
             </motion.p>
 
-            <motion.h1
-              initial={{ opacity: 0, scale: 0.5, filter: "blur(20px)" }}
-              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              transition={{ delay: 0.5, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-              style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 900,
-                fontSize: "clamp(60px, 14vw, 180px)", lineHeight: 0.9,
-                color: "white", margin: 0,
-                background: `linear-gradient(${135 + (mousePos.x - 0.5) * 30}deg, #fff 0%, rgba(214,68,121,0.9) 50%, rgba(253,186,47,0.8) 100%)`,
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                textShadow: "none",
-                transition: "background 0.5s ease",
-              }}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.8, ease: "easeOut" }}
             >
-              NAILA
-            </motion.h1>
+              <ScratchReveal />
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
