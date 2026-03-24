@@ -248,7 +248,7 @@ export default function ScrollExperience({ onExit, onOpenPanel }: {
         title="Switch to day mode"
         aria-label="Switch to day mode"
         style={{
-          position: "fixed", top: 24, right: 24, zIndex: 300,
+          position: "fixed", bottom: 24, left: 24, zIndex: 300,
           background: "none", border: "none", padding: 0, cursor: "pointer",
         }}
       >
