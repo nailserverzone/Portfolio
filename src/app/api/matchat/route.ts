@@ -15,6 +15,10 @@ const RATE_LIMIT_MAX = 5; // max 5 messages per minute
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+  // Inline cleanup of stale entries (no setInterval in serverless)
+  for (const [key, entry] of rateLimitMap) {
+    if (now > entry.resetAt) rateLimitMap.delete(key);
+  }
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
@@ -23,14 +27,6 @@ function isRateLimited(ip: string): boolean {
   entry.count++;
   return entry.count > RATE_LIMIT_MAX;
 }
-
-// Cleanup stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap) {
-    if (now > entry.resetAt) rateLimitMap.delete(ip);
-  }
-}, 300_000);
 
 /* ── Allowed colors (whitelist) ── */
 const ALLOWED_COLORS = new Set([
@@ -63,17 +59,23 @@ function isSpam(text: string): boolean {
 
 /* ══ GET — Fetch approved messages ══ */
 export async function GET() {
-  const { data, error } = await getSupabase()
-    .from("matchat_messages")
-    .select("*")
-    .eq("status", "approved")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  try {
+    const { data, error } = await getSupabase()
+      .from("matchat_messages")
+      .select("*")
+      .eq("status", "approved")
+      .order("created_at", { ascending: false })
+      .limit(100);
 
-  if (error) {
-    return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
+    if (error) {
+      console.error("[matchat] Fetch error:", error);
+      return NextResponse.json({ error: "Failed to fetch messages" }, { status: 500 });
+    }
+    return NextResponse.json({ messages: data });
+  } catch (e) {
+    console.error("[matchat] GET error:", e);
+    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
-  return NextResponse.json({ messages: data });
 }
 
 /* ══ POST — Submit a new message (goes to pending queue) ══ */
@@ -131,17 +133,22 @@ export async function POST(req: NextRequest) {
   }
 
   /* Insert as pending */
-  const { error } = await getSupabase()
-    .from("matchat_messages")
-    .insert({
-      message: cleanMessage,
-      color,
-      status: "pending",
-    });
+  try {
+    const { error } = await getSupabase()
+      .from("matchat_messages")
+      .insert({
+        message: cleanMessage,
+        color,
+        status: "pending",
+      });
 
-  if (error) {
-    console.error("[matchat] Insert error:", error);
-    return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    if (error) {
+      console.error("[matchat] Insert error:", error);
+      return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    }
+  } catch (e) {
+    console.error("[matchat] POST error:", e);
+    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
 
   /* Notify admin (best-effort, non-blocking) */

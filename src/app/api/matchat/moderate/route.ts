@@ -54,16 +54,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await getSupabase()
-    .from("matchat_messages")
-    .select("*")
-    .eq("status", "pending")
-    .order("created_at", { ascending: false });
+  try {
+    const { data, error } = await getSupabase()
+      .from("matchat_messages")
+      .select("*")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: "Failed to fetch pending messages" }, { status: 500 });
+    if (error) {
+      console.error("[matchat/moderate] Fetch error:", error);
+      return NextResponse.json({ error: "Failed to fetch pending messages" }, { status: 500 });
+    }
+    return NextResponse.json({ messages: data });
+  } catch (e) {
+    console.error("[matchat/moderate] GET error:", e);
+    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
   }
-  return NextResponse.json({ messages: data });
 }
 
 /* ══ POST — Approve / Deny / Delete a message ══ */
@@ -102,19 +108,24 @@ export async function POST(req: NextRequest) {
   }
 
   /* Execute action */
-  if (action === "approve") {
-    const { error } = await getSupabase()
-      .from("matchat_messages")
-      .update({ status: "approved" })
-      .eq("id", message_id);
-    if (error) return NextResponse.json({ error: "Failed to approve" }, { status: 500 });
-  } else if (action === "deny" || action === "delete") {
-    const { error } = await getSupabase()
-      .from("matchat_messages")
-      .delete()
-      .eq("id", message_id);
-    if (error) return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
-  }
+  try {
+    if (action === "approve") {
+      const { error } = await getSupabase()
+        .from("matchat_messages")
+        .update({ status: "approved" })
+        .eq("id", message_id);
+      if (error) return NextResponse.json({ error: "Failed to approve" }, { status: 500 });
+    } else if (action === "deny" || action === "delete") {
+      const { error } = await getSupabase()
+        .from("matchat_messages")
+        .delete()
+        .eq("id", message_id);
+      if (error) return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
+    }
 
-  return NextResponse.json({ success: true, action });
+    return NextResponse.json({ success: true, action });
+  } catch (e) {
+    console.error("[matchat/moderate] POST error:", e);
+    return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+  }
 }
