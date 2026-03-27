@@ -121,8 +121,13 @@ export default function MatchatPanel() {
   };
 
   /* ── Admin login via long press on logo ── */
-  const startHold = () => {
-    holdTimer.current = setTimeout(() => setShowAdminLogin(true), 3000);
+  const startHold = (e: React.PointerEvent | React.TouchEvent) => {
+    e.preventDefault(); // prevent context menu on mobile long-press
+    holdTimer.current = setTimeout(() => {
+      setShowAdminLogin(true);
+      // vibrate on mobile if supported
+      if (typeof navigator !== "undefined" && navigator.vibrate) navigator.vibrate(50);
+    }, 2000);
   };
   const endHold = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);
@@ -154,14 +159,18 @@ export default function MatchatPanel() {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
         <motion.img
           src="/icons/matchat.svg"
-          alt="Matchat"
+          alt="Matchat — hold to admin"
           draggable={false}
           onPointerDown={startHold}
           onPointerUp={endHold}
           onPointerLeave={endHold}
+          onTouchStart={startHold}
+          onTouchEnd={endHold}
+          onTouchCancel={endHold}
+          onContextMenu={(e) => e.preventDefault()}
           animate={{ rotate: [0, 5, -5, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          style={{ width: 48, height: 48, objectFit: "contain", cursor: "pointer" }}
+          style={{ width: 48, height: 48, objectFit: "contain", cursor: "pointer", touchAction: "none", userSelect: "none" }}
         />
         <div>
           <h3 style={{
