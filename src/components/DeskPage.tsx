@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Terminal from "@/components/Terminal";
 import ProjectJournal from "@/components/ProjectJournal";
@@ -14,12 +14,38 @@ import MatchatPanel from "@/components/MatchatPanel";
 import Modal from "@/components/Modal";
 import ScrollExperience from "@/components/ScrollExperience";
 
+const PANEL_IDS = new Set([
+  "terminal", "about", "projects", "cards", "skilllab", "contact",
+  "gallery", "gallery-talks", "gallery-design", "gallery-events", "matchat",
+]);
+
 export default function DeskPage() {
   const [activePanel, setActivePanel] = useState<string | null>(null);
   const [nightMode, setNightMode] = useState(false);
   const [flowers, setFlowers] = useState<{ id: number; x: number; y: number; emoji: string }[]>([]);
-  const open = useCallback((id: string) => setActivePanel(id), []);
-  const close = () => setActivePanel(null);
+
+  // Sync URL hash → panel state
+  useEffect(() => {
+    const readHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && PANEL_IDS.has(hash)) {
+        setActivePanel(hash);
+      }
+    };
+    readHash();
+    window.addEventListener("hashchange", readHash);
+    return () => window.removeEventListener("hashchange", readHash);
+  }, []);
+
+  const open = useCallback((id: string) => {
+    setActivePanel(id);
+    window.history.replaceState(null, "", `#${id}`);
+  }, []);
+
+  const close = () => {
+    setActivePanel(null);
+    window.history.replaceState(null, "", window.location.pathname);
+  };
 
   const handleNailaClick = () => {
     const petals = ["🌸", "🌺", "🌷", "🌼", "💐", "🌸", "🌺", "🌷", "🌼", "💮"];
@@ -37,7 +63,10 @@ export default function DeskPage() {
 
   const navigatePanel = (id: string) => {
     setActivePanel(null);
-    setTimeout(() => setActivePanel(id), 300);
+    setTimeout(() => {
+      setActivePanel(id);
+      window.history.replaceState(null, "", `#${id}`);
+    }, 300);
   };
 
   const panels: Record<string, { title: string; content: React.ReactNode }> = {
