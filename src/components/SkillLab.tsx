@@ -20,7 +20,9 @@ const skillColor = (s: string): string => {
     "Field Sampling":"#687b3d", "MANOVA":"#7596c8",
     "Event Design":"#fdba2f", "Public Speaking":"#fdba2f",
     "ML in R & Python":"#7596c8", "Podcast Production":"#fdba2f",
-    "Survey Design":"#687b3d",
+    "Survey Design":"#687b3d", "Quantitative Analysis":"#7596c8",
+    "Data Analysis":"#7596c8", "Python":"#7596c8", "R":"#7596c8",
+    "Graphic Design":"#fdba2f", "Canva":"#fdba2f", "CorelDraw":"#fdba2f", "Photoshop":"#fdba2f",
   };
   return map[s] || "#888";
 };

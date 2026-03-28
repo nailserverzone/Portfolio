@@ -10,7 +10,8 @@ const experience = [
 ];
 
 const publications = [
-  { id:"C.1", badge:"Honourable Mention", venue:"ACM CHI 2026", title:"Tattered Teddies and Pentagram Charms", type:"refereed" },
+  { id:"C.1", badge:"Honourable Mention", venue:"ACM CHI 2026", title:"Tattered Teddies and Pentagram Charms: How People Use Touchable Comfort Objects and What This Means for Designing Affective Haptic Systems", authors:"P. Vyas, B. Guta, A. Bao, R. Guerra, M. Solen, N. N. Himam, A. Uusberg, K. MacLean", type:"refereed" },
+  { id:"J.1", badge:"Journal", venue:"IEEE Transactions on Affective Computing, 2026", title:"Haptically Experienced Animacy Through Affiliative Touch Facilitates Emotion Regulation: A Theory-Driven Investigation", authors:"P. Vyas, B. Guta, T. Zhou, N. N. Himam, A. Uusberg, K. MacLean", type:"refereed" },
 ];
 
 const awards = [
@@ -272,9 +273,12 @@ export default function AboutPanel({ onNavigate }: { onNavigate?: (id: string) =
                         PUBLISHED
                       </span>
                     </div>
-                    <h4 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:"1.6rem",color:"var(--ink)",margin:0,lineHeight:1.3 }}>
+                    <h4 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:700,fontSize:"1.6rem",color:"var(--ink)",margin:"0 0 6px",lineHeight:1.3 }}>
                       {p.title}
                     </h4>
+                    <span style={{ fontFamily:"'DM Sans',serif",fontSize:"1.1rem",color:"var(--ink-2)",display:"block",marginBottom:4 }}>
+                      {p.authors}
+                    </span>
                     <span style={{ fontFamily:"'DM Sans',serif",fontStyle:"italic",fontSize:"1.3rem",color:"var(--ink-2)" }}>
                       {p.venue}
                     </span>
@@ -283,16 +287,6 @@ export default function AboutPanel({ onNavigate }: { onNavigate?: (id: string) =
               ))}
             </div>
 
-            <ScrollReveal direction="fade" delay={300} duration={1000}>
-              <div style={{ textAlign:"center",padding:"36px 0 16px",marginTop:24,borderTop:"2px dashed var(--bg-3)" }}>
-                <p style={{ fontFamily:"'DM Sans',serif",fontStyle:"italic",fontSize:"1.4rem",color:"var(--ink-2)",margin:0 }}>
-                  More publications coming soon...
-                </p>
-                <p style={{ fontFamily:"'Plus Jakarta Sans',sans-serif",fontWeight:600,fontSize:"1.1rem",color:"var(--green)",marginTop:10 }}>
-                  Currently working on 3 manuscripts in HCI &amp; affective computing
-                </p>
-              </div>
-            </ScrollReveal>
           </motion.div>
         )}
 

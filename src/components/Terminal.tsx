@@ -30,7 +30,7 @@ export default function Terminal({ onNavigate }: { onNavigate: (id: string) => v
       } else if (c === "2" || c === "read") {
         setMode("read");
         push(raw,
-          "\ud83d\udcd6 READ MODE  - Everything as text, right here.\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n  about       \u2192 Who I am\n  projects    \u2192 All 14 research projects\n  project [#] \u2192 View one project (1-14)\n  skills      \u2192 My technical skills\n  contact     \u2192 Contact info\n  music       \u2192 What I listen to\n  funfact     \u2192 Random fun fact\n  secret      \u2192 Hidden surprise\n\nType 'switch' to change mode \u00b7 'clear' to reset"
+          "\ud83d\udcd6 READ MODE  - Everything as text, right here.\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\n  about       \u2192 Who I am\n  projects    \u2192 All 14 research projects\n  project [#] \u2192 View one project (1-14)\n  skills      \u2192 My technical skills\n  contact     \u2192 Contact info\n  music       \u2192 What I listen to\n  funfact     \u2192 Random fun fact\n\nType 'switch' to change mode \u00b7 'clear' to reset"
         );
       } else {
         push(raw, "\u2753 Type 1 for GO (visual) or 2 for READ (text-only).");
@@ -52,7 +52,7 @@ export default function Terminal({ onNavigate }: { onNavigate: (id: string) => v
       if (mode === "go") {
         push(raw, "\ud83d\ude80 GO MODE COMMANDS\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n  about \u00b7 projects \u00b7 cards\n  contact \u00b7 gallery\n\n  switch \u2192 Change mode\n  clear  \u2192 Reset terminal");
       } else {
-        push(raw, "\ud83d\udcd6 READ MODE COMMANDS\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n  about \u00b7 projects \u00b7 project [#]\n  skills \u00b7 contact \u00b7 music\n  funfact \u00b7 secret\n\n  switch \u2192 Change mode\n  clear  \u2192 Reset terminal");
+        push(raw, "\ud83d\udcd6 READ MODE COMMANDS\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n  about \u00b7 projects \u00b7 project [#]\n  skills \u00b7 contact \u00b7 music\n  funfact\n\n  switch \u2192 Change mode\n  clear  \u2192 Reset terminal");
       }
       return;
     }
@@ -101,10 +101,7 @@ export default function Terminal({ onNavigate }: { onNavigate: (id: string) => v
       push(raw, "CONTACT\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n\nEmail     noornaila04@gmail.com\nLinkedIn  /in/noornaila\nGitHub    nailserverzone\nNotion    noornaila.notion.site");
     }
     else if (c === "music") {
-      push(raw, "NOW PLAYING\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nBTS  - Dynamite\nMOTS:7 \u00b7 Proof \u00b7 Dark & Wild\nLo-fi beats for studying\nARMY since 2019");
-    }
-    else if (c === "secret") {
-      push(raw, "SECRET UNLOCKED\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nYes, I collect Pokemon cards.\nHolographic = chef's kiss.\nCat approves.\nBTS photocards too.");
+      push(raw, "NOW PLAYING\n\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\nBTS  - Dynamite\nMOTS:7 \u00b7 Proof \u00b7 Dark & Wild\nLo-fi beats for studying\nARMY since 2016\nBias: Yoongi \u2764\ufe0f");
     }
     else if (c === "funfact") {
       push(raw, FUN_FACTS[Math.floor(Math.random() * FUN_FACTS.length)]);
