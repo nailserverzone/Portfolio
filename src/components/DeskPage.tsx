@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Terminal from "@/components/Terminal";
-import ProjectJournal from "@/components/ProjectJournal";
+import ProjectJournal, { findProjectBySlug } from "@/components/ProjectJournal";
 import PokemonPack from "@/components/PokemonPack";
 import AboutPanel from "@/components/AboutPanel";
 import ContactPanel from "@/components/ContactPanel";
@@ -21,6 +21,7 @@ const PANEL_IDS = new Set([
 
 export default function DeskPage() {
   const [activePanel, setActivePanel] = useState<string | null>(null);
+  const [projectSlug, setProjectSlug] = useState<string | undefined>(undefined);
   const [nightMode, setNightMode] = useState(false);
   const [flowers, setFlowers] = useState<{ id: number; x: number; y: number; emoji: string }[]>([]);
 
@@ -28,7 +29,14 @@ export default function DeskPage() {
   useEffect(() => {
     const readHash = () => {
       const hash = window.location.hash.replace("#", "");
-      if (hash && PANEL_IDS.has(hash)) {
+      if (hash.startsWith("project/")) {
+        const slug = hash.replace("project/", "");
+        if (findProjectBySlug(slug)) {
+          setProjectSlug(slug);
+          setActivePanel("projects");
+        }
+      } else if (hash && PANEL_IDS.has(hash)) {
+        setProjectSlug(undefined);
         setActivePanel(hash);
       }
     };
@@ -44,6 +52,7 @@ export default function DeskPage() {
 
   const close = () => {
     setActivePanel(null);
+    setProjectSlug(undefined);
     window.history.replaceState(null, "", window.location.pathname);
   };
 
@@ -72,7 +81,7 @@ export default function DeskPage() {
   const panels: Record<string, { title: string; content: React.ReactNode }> = {
     terminal: { title: "🖥 Terminal", content: <Terminal onNavigate={navigatePanel} /> },
     about: { title: "📷 About Me", content: <AboutPanel onNavigate={navigatePanel} /> },
-    projects: { title: "📂 Projects", content: <ProjectJournal onNavigate={navigatePanel} /> },
+    projects: { title: "📂 Projects", content: <ProjectJournal onNavigate={navigatePanel} initialProjectSlug={projectSlug} /> },
     cards: { title: "🎴 ???.exe", content: <PokemonPack onNavigate={navigatePanel} /> },
     skilllab: { title: "🧪 Skill Lab", content: <SkillLab onNavigate={navigatePanel} /> },
     contact: { title: "📱 Contact", content: <ContactPanel /> },

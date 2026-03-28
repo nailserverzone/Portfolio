@@ -334,10 +334,31 @@ function PhysicsThumb({
   );
 }
 
-export default function ProjectJournal({ onNavigate }: { onNavigate?: (panel: string) => void }) {
-  const [sel, setSel] = useState<typeof PROJECTS[0] | null>(null);
+function toSlug(title: string): string {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+export function findProjectBySlug(slug: string): typeof PROJECTS[0] | null {
+  return PROJECTS.find(p => toSlug(p.title) === slug) ?? null;
+}
+
+export default function ProjectJournal({ onNavigate, initialProjectSlug }: { onNavigate?: (panel: string) => void; initialProjectSlug?: string }) {
+  const [sel, setSel] = useState<typeof PROJECTS[0] | null>(() => {
+    if (initialProjectSlug) return findProjectBySlug(initialProjectSlug);
+    return null;
+  });
   const [filter, setFilter] = useState("ALL");
   const [hovered, setHovered] = useState<number | null>(null);
+
+  const selectProject = (p: typeof PROJECTS[0]) => {
+    setSel(p);
+    window.history.replaceState(null, "", `#project/${toSlug(p.title)}`);
+  };
+
+  const deselectProject = () => {
+    setSel(null);
+    window.history.replaceState(null, "", "#projects");
+  };
 
   const cats = ["ALL", "RESEARCH", "UI/UX", "AI/ML", "PROJECT MANAGEMENT", "DESIGN"];
   const list = filter === "ALL" ? PROJECTS : PROJECTS.filter(p => p.tags.includes(filter));
@@ -348,7 +369,7 @@ export default function ProjectJournal({ onNavigate }: { onNavigate?: (panel: st
       <ProjectDetail
         project={sel}
         thumbSrc={THUMB_IMAGES[sel.id - 1]}
-        onBack={() => setSel(null)}
+        onBack={deselectProject}
       />
     );
   }
@@ -392,7 +413,7 @@ export default function ProjectJournal({ onNavigate }: { onNavigate?: (panel: st
                   if (GALLERY_PROJECTS[p.id] && onNavigate) {
                     onNavigate(GALLERY_PROJECTS[p.id]);
                   } else {
-                    setSel(p);
+                    selectProject(p);
                   }
                 }}
                 initial={{ opacity:0, y:30 }}
